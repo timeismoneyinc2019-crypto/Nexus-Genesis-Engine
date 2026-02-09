@@ -1,0 +1,21 @@
+# ==============================================================================
+# PROPRIETARY AND CONFIDENTIAL - NEXUS GENESIS ENGINE (v1.0.4)
+# ==============================================================================
+# Copyright (c) 2026 Nexus Infrastructure Group. All rights reserved.
+#
+# This source code, including all associated hardware emulation logic, 
+# neuromorphic threshold algorithms, and autonomous adversarial AI modules, 
+# is the intellectual property of Nexus. 
+#
+# NOTICE: This code is "Source-Available" for audit and transparency purposes
+# only. Unauthorized copying, modification, distribution, or commercial 
+# deployment of this file, via any medium, is strictly prohibited. 
+# 
+# Use of this software requires a valid Commercial License Agreement. 
+# For licensing inquiries, contact: legal@nexus-infrastructure.io
+
+
+# Nexus Genesis Core Dependencies
+numpy>=1.24.0      # Required for Memristor SGD & high-performance math
+# Note: 'secrets', 'json', 'threading', 'os', 'hashlib', and 'datetime' 
+# are part of the Python Standard Library and do not need to be listed here.
