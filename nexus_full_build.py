@@ -26,6 +26,7 @@ import numpy as np
 from datetime import datetime
 from abc import ABC, abstractmethod
 import hashlib
+from nexus_entropic_anchor import EntropicAnchor
 
 # --- 1. THE PHYSICS LAYER: MEMRISTOR SGD (NUMERIC HARDWARE EMULATION) ---
 class MemristorLogicGate:
