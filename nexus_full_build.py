@@ -15,6 +15,8 @@
 # For licensing inquiries, contact: legal@nexus-infrastructure.io
 # ==============================================================================
 
+from sequencer import Sequencer
+
 import os
 import json
 import secrets
