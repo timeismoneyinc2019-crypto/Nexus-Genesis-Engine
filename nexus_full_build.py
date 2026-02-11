@@ -90,6 +90,9 @@ class NexusCore:
         self.threshold = threshold
         self.ledger_path = "nexus_immutable_core.json"
 
+    self.entropic_anchor = EntropicAnchor()
+self.previous_epoch_hash = "GENESIS"  # Starting point for your first anchor
+
     def process_transaction(self, signals, data):
         # A. Physics Check (Threshold Logic)
         potential = self.gate.compute_potential(signals)
