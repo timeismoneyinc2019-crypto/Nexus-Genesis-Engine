@@ -1,5 +1,5 @@
 # ==============================================================================
-# PROPRIETARY AND CONFIDENTIAL - NEXUS GENESIS ENGINE (v1.0.4)
+# PROPRIETARY AND CONFIDENTIAL - NEXUS GENESIS ENGINE (v1.0.5)
 # ==============================================================================
 # Copyright (c) 2026 Nexus Infrastructure Group. All rights reserved.
 #
@@ -16,6 +16,7 @@
 # ==============================================================================
 
 from sequencer import Sequencer
+from nexus_entropic_anchor import EntropicAnchor
 
 import os
 import json
@@ -24,43 +25,34 @@ import threading
 import time
 import numpy as np
 from datetime import datetime
-from abc import ABC, abstractmethod
 import hashlib
-from nexus_entropic_anchor import EntropicAnchor
 
-# --- 1. THE PHYSICS LAYER: MEMRISTOR SGD (NUMERIC HARDWARE EMULATION) ---
+# --- 1. THE PHYSICS LAYER: MEMRISTOR SGD ---
 class MemristorLogicGate:
-    """Emulates a 2046-era Memristive Threshold Gate using real-time SGD tuning."""
     def __init__(self, input_dim=5):
-        # Physical 'Resistance' weights initialized via normal distribution
         self.weights = np.random.randn(input_dim)
         self.bias = np.random.randn(1)
         self.learning_rate = 0.05
 
     def compute_potential(self, signals):
-        """Ohm's Law simulation: Firing potential = Sum of (Signals * Weights)."""
         return np.dot(signals, self.weights) + self.bias
 
     def adjust_sensitivity(self, target_met, signals):
-        """Self-learning loop: Adjusts hardware threshold based on epoch success."""
         error = 1.0 if target_met else -1.0
         self.weights += self.learning_rate * error * signals
 
 # --- 2. THE LAW ENVELOPE & ADMISSIBILITY GATE ---
 class LegalVerificationLayer:
-    """Hard-coded regulatory guardrails that cannot be bypassed by software."""
     def __init__(self):
         self.jurisdiction = os.getenv("NEXUS_ZONE", "GLOBAL_NEUTRAL")
 
     def verify_admissibility(self, data_payload):
-        # Real-world check for PII, unauthorized metadata, or time-drift
         if "PRIVATE_KEY" in str(data_payload):
             return False, "ADMISSIBILITY_FAILED: EXPOSED_CREDENTIALS"
         return True, "VERIFIED_ADMISSIBLE"
 
-# --- 3. THE RED TEAM AI: AUTONOMOUS STRESS-TESTING AGENT ---
+# --- 3. THE RED TEAM AI ---
 class RedTeamAgent(threading.Thread):
-    """The 'Immune System' - constantly probes for logic loopholes."""
     def __init__(self, target_core):
         super().__init__()
         self.target = target_core
@@ -69,20 +61,16 @@ class RedTeamAgent(threading.Thread):
 
     def run(self):
         while True:
-            # SHADOW SIMULATION: Attempting 'Poisoned Entropy' and 'Voltage Spikes'
-            malicious_signals = np.random.uniform(-5.0, 5.0, 5)
-            malicious_data = {"exploit": "BUFFER_OVERFLOW_TEST", "payload": "0xDEADBEEF"}
-            
-            success, _ = self.target.process_transaction(malicious_signals, malicious_data)
-            
+            signals = np.random.uniform(-5.0, 5.0, 5)
+            data = {"exploit": "BUFFER_OVERFLOW_TEST", "payload": "0xDEADBEEF"}
+            success, _ = self.target.process_transaction(signals, data)
             if success:
                 self.attack_log.append(f"CRITICAL BREACH @ {datetime.now()}")
             else:
-                self.attack_log.append(f"DEFENSE_STABLE: Rejected malformed epoch.")
-            
-            time.sleep(2) # Continuous probing
+                self.attack_log.append(f"DEFENSE_STABLE @ {datetime.now()}")
+            time.sleep(2)
 
-# --- 4. THE INTEGRATED NEXUS CORE ---
+# --- 4. THE INTEGRATED NEXUS CORE WITH SEQUENCER ---
 class NexusCore:
     def __init__(self, threshold=2.0):
         self.gate = MemristorLogicGate()
@@ -90,54 +78,72 @@ class NexusCore:
         self.threshold = threshold
         self.ledger_path = "nexus_immutable_core.json"
 
-    self.entropic_anchor = EntropicAnchor()
-self.previous_epoch_hash = "GENESIS"  # Starting point for your first anchor
+        # Sequencer Integration
+        self.sequencer = Sequencer()
+        # Entropic Anchor Integration
+        self.entropic_anchor = EntropicAnchor()
+        self.previous_epoch_hash = "GENESIS"
 
-    def process_transaction(self, signals, data):
-        # A. Physics Check (Threshold Logic)
+    def process_transaction(self, signals, data, user_id=None):
         potential = self.gate.compute_potential(signals)
-        
-        # B. Law Check (Admissibility Gate)
         is_legal, legal_msg = self.legal.verify_admissibility(data)
-        
+
+        # Entropic Anchor Check
+        anchor = self.entropic_anchor.calculate_causal_index(signals, self.previous_epoch_hash)
+        if not anchor['integrity_locked']:
+            if user_id:
+                self.sequencer.slash_user(user_id)
+            return False, "ENTROPIC_ANCHOR_VIOLATION"
+
+        # Main Threshold & Legal Check
         if potential >= self.threshold and is_legal:
-            # Generate the 'Epoch' using QES Entropy
             entropy = secrets.token_hex(32)
             epoch_id = hashlib.sha3_256(f"{entropy}:{potential}".encode()).hexdigest()
-            
+            self.previous_epoch_hash = epoch_id
+
             result = {"epoch": epoch_id, "status": "COMMITTED", "timestamp": str(datetime.now())}
             self._commit_to_ledger(result)
-            self.gate.adjust_sensitivity(True, signals) # Reinforce successful state
+            self.gate.adjust_sensitivity(True, signals)
             return True, result
         else:
-            self.gate.adjust_sensitivity(False, signals) # Increase sensitivity to failure
+            self.gate.adjust_sensitivity(False, signals)
+            if user_id:
+                self.sequencer.slash_user(user_id)
             return False, "GATE_CLOSED"
 
     def _commit_to_ledger(self, entry):
-        # Persistence: Append to the immutable disk ledger
         with open(self.ledger_path, "a") as f:
             f.write(json.dumps(entry) + "\n")
 
-# --- 5. EXECUTION & MASTER CLOCK INITIALIZATION ---
+# --- 5. EXECUTION & MASTER CLOCK ---
 if __name__ == "__main__":
-    import hashlib
     print("--- NEXUS GENESIS INITIALIZED: MASTER CLOCK ONLINE ---")
     
     nexus = NexusCore()
     red_team = RedTeamAgent(nexus)
     red_team.start()
 
-    # Simulation: Processing 3 high-validity signals
-    for i in range(3):
+    # Example: Register users
+    nexus.sequencer.register_user('user1')
+    nexus.sequencer.register_user('user2')
+    nexus.sequencer.stake_tokens('user1', 100)
+    nexus.sequencer.stake_tokens('user2', 200)
+
+    # Simulation of transactions
+    for i in range(5):
         print(f"\n[Epoch Cycle {i}] Capturing Entropy...")
-        real_world_signals = np.array([0.8, 1.2, 0.9, 1.5, 0.7])
-        success, response = nexus.process_transaction(real_world_signals, {"event": "GLOBAL_SETTLEMENT"})
+
+        signals = np.array([0.8, 1.2, 0.9, 1.5, 0.7])
+        user = 'user1' if i % 2 == 0 else 'user2'
+        success, response = nexus.process_transaction(signals, {"event": "GLOBAL_SETTLEMENT"}, user_id=user)
         
         if success:
-            print(f"ADMISSIBILITY GATE OPEN: Epoch {response['epoch'][:12]} finalized.")
+            print(f"ADMISSIBILITY GATE OPEN: Epoch {response['epoch'][:12]} finalized for {user}.")
         else:
-            print("THRESHOLD NOT MET: Adjusting hardware weights...")
+            print(f"TRANSACTION FAILED: {response} -> {user} has been slashed if applicable.")
+
         time.sleep(1)
 
     print(f"\n[Red Team Status]: {len(red_team.attack_log)} Probes Deflected.")
     print("Nexus Status: PERSISTENT | IMMUTABLE | ADMISSIBLE")
+    print("Sequencer Reputation Scores:", nexus.sequencer.display_scores())
