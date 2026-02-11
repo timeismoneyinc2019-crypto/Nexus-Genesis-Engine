@@ -5,19 +5,34 @@ class Sequencer:
         self.reputation_scores = {}
 
     def register_user(self, user_id):
-        if user_id not in self.users:
-            self.users[user_id] = {'stake': 0, 'malicious_behaviors': 0}
-            self.reputation_scores[user_id] = 100  # Start with full reputation
+    if user_id not in self.users:
+        # Initialize user data with a history bucket for Landauer-friendly state preservation
+        self.users[user_id] = {
+            'stake': 0,
+            'stake_history': [],        # <- saves old stake values instead of overwriting
+            'malicious_behaviors': 0
+        }
+        # Start with full reputation
+        self.reputation_scores[user_id] = 100
 
     def stake_tokens(self, user_id, amount):
         if user_id in self.users:
             self.users[user_id]['stake'] += amount
 
     def slash_user(self, user_id):
-        if user_id in self.users:
-            self.users[user_id]['stake'] *= 0.5  # Slash half the stake
-            self.users[user_id]['malicious_behaviors'] += 1
-            self.update_reputation(user_id)
+    if user_id in self.users:
+        # Save the current stake before changing it
+        old_stake = self.users[user_id]['stake']
+        self.users[user_id]['stake_history'].append(old_stake)
+
+        # Apply the penalty (halve the stake)
+        self.users[user_id]['stake'] = old_stake * 0.5
+
+        # Record the malicious behavior
+        self.users[user_id]['malicious_behaviors'] += 1
+
+        # Update the reputation after slashing
+        self.update_reputation(user_id)
 
     def update_reputation(self, user_id):
         if self.users[user_id]['malicious_behaviors'] > 0:
