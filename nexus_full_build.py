@@ -27,11 +27,13 @@ import numpy as np
 from datetime import datetime
 import hashlib
 
+import numpy as np
+
 # --- 1. THE PHYSICS LAYER: MEMRISTOR SGD ---
-class MemristorLogicGate:
+class NeuromorphicThresholdGate:
     def __init__(self, input_dim=5):
         self.weights = np.random.randn(input_dim)
-        self.bias = np.random.randn(1)
+        self.bias = np.random.randn()
         self.learning_rate = 0.05
 
     def compute_potential(self, signals):
@@ -40,6 +42,7 @@ class MemristorLogicGate:
     def adjust_sensitivity(self, target_met, signals):
         error = 1.0 if target_met else -1.0
         self.weights += self.learning_rate * error * signals
+
 
 # --- 2. THE LAW ENVELOPE & ADMISSIBILITY GATE ---
 class LegalVerificationLayer:
