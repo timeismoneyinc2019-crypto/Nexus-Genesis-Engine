@@ -1,0 +1,50 @@
+# ==============================================================================
+# NEXUS SOURCE-AVAILABLE SOVEREIGN LICENSE (v1.0)
+# ==============================================================================
+
+Copyright (c) 2026 Nexus Infrastructure Group. All rights reserved.
+
+This software, including all source code, configurations, and documentation 
+(collectively, the "Software"), is proprietary and source-available under the
+terms below.
+
+1. DEFINITIONS
+   • "Nexus" refers to Nexus Infrastructure Group, the sole authority for this
+     Software.
+   • "Audit" means read-only review of the Software for the purpose of 
+     validation, research, or compliance. No execution or derivative work 
+     beyond allowed dependencies is permitted without explicit Nexus approval.
+
+2. LICENSE GRANT
+   Nexus grants the following limited rights:
+   2.1 Audit Rights: Authorized third parties may review the Software for
+        transparency, research, or compliance purposes only.
+   2.2 Operational Dependency: Integration with the Software may occur only
+        through official APIs or channels explicitly authorized by Nexus.
+   2.3 Research Use: Non-commercial, academic, or governmental review is
+        permitted with written permission from Nexus.
+
+3. PROHIBITED USES
+   • No reproduction, distribution, or modification outside granted rights.
+   • No forking, rehosting, or rebranding without Nexus approval.
+   • No commercial exploitation without a formal license agreement.
+
+4. AUTHORITY
+   Nexus is the canonical source for this Software. Any reliance on it outside
+   authorized channels is at the user's risk.
+
+5. LIABILITY
+   • The Software is provided "as-is."
+   • Nexus disclaims all warranties, express or implied.
+   • Nexus is not responsible for losses arising from use, execution, or
+     integration.
+
+6. GOVERNING LAW
+   This License is governed by the laws of the State of North Dakota, United
+   States of America. Exclusive jurisdiction lies in the courts of Fargo, ND.
+
+7. ENFORCEMENT
+   Any use outside this License is considered infringement and will be subject
+   to legal action.
+
+# End of License

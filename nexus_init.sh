@@ -1,11 +1,10 @@
-bash
 #!/bin/bash
 
 # Nexus Infrastructure Build Script v1.0.4
 # Purpose: Initialize Nexus Core with QES (Quantum Entropic Sequencing) 
 # and Neuromorphic Emulation Layer.
 
-set -e # Exit on error
+set -euo pipefail  # Exit on error, undefined variable, or pipe failure
 
 echo "--- Initializing Nexus Infrastructure Deployment ---"
 
@@ -13,13 +12,15 @@ echo "--- Initializing Nexus Infrastructure Deployment ---"
 echo "Step 1: Provisioning System Dependencies..."
 sudo apt-get update && sudo apt-get upgrade -y
 sudo apt-get install -y build-essential docker.io docker-compose \
-     python3-pip libssl-dev pkg-config clang cmake
+    python3-pip libssl-dev pkg-config clang cmake
 
 ## 2. The Memristor Emulation Layer (Neuromorphic Interface)
 # This layer simulates the hardware-level learning mentioned in your 10-year projection.
 echo "Step 2: Deploying Neuromorphic Emulation Layer..."
-cat <<EOF > docker-compose.yml
+
+cat > docker-compose.yml <<EOF
 version: '3.8'
+
 services:
   nexus-memristor-core:
     image: nexus-org/memristor-emulator:latest
@@ -27,8 +28,8 @@ services:
     volumes:
       - ./entropy_source:/dev/random
     environment:
-      - QUANTUM_SEED_THRESHOLD=0.998
-      - EPOCH_LOGIC_SYNC=true
+      QUANTUM_SEED_THRESHOLD: "0.998"
+      EPOCH_LOGIC_SYNC: "true"
 
   nexus-blockchain-core:
     image: nexus-org/sharded-ledger:latest
@@ -39,14 +40,16 @@ services:
   qes-anchor:
     build: ./qes_engine
     environment:
-      - NODE_ROLE=UNIVERSAL_REFERENCE
+      NODE_ROLE: "UNIVERSAL_REFERENCE"
 EOF
 
 ## 3. QES (Quantum Entropic Sequencing) Logic Implementation
 # This Python-based logic handles the "Entropy Anchor" variable.
 echo "Step 3: Compiling QES Validation Engine..."
+
 mkdir -p qes_engine
-cat <<EOF > qes_engine/anchor.py
+
+cat > qes_engine/anchor.py <<'EOF'
 import hashlib
 import time
 import os
@@ -70,15 +73,15 @@ EOF
 
 ## 4. Immutable Core & Sharding Setup
 echo "Step 4: Initializing Heterogeneous Sharding..."
-# Placeholder for the sharding configuration
-# This ensures that without Nexus's QES, the shards cannot be reassembled.
+
 mkdir -p storage/shards
 touch storage/shards/.nexus_lock
 
 ## 5. Network & Security Hardening (Red Team AI Guardrails)
 echo "Step 5: Applying Post-Quantum Cryptography & Ethical Guardrails..."
-# Set up ZK-Proof validation service
-docker pull nexus-org/zkp-validator:latest
+
+# Pull Zero-Knowledge Proof validation service image
+sudo docker pull nexus-org/zkp-validator:latest
 
 echo "--- Nexus Infrastructure Build Complete ---"
 echo "Status: UNIVERSAL REFERENCE FRAME ACTIVE"
