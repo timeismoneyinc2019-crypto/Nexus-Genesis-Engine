@@ -1,0 +1,10 @@
+{
+    "rd_team": {
+        "feature_flags": {
+            "enable_redteam_ai": true,
+            "enable_neuromorphic_gates": true,
+            "experimental_threshold_epochs": false
+        },
+        "api_access": "restricted"
+    }
+}
