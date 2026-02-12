@@ -10,7 +10,7 @@ echo "--- Initializing Nexus Infrastructure Deployment ---"
 
 ## 1. Environment & Dependency Provisioning
 echo "Step 1: Provisioning System Dependencies..."
-sudo apt-get update -y && sudo apt-get upgrade -y
+sudo apt-get update && sudo apt-get upgrade -y
 sudo apt-get install -y build-essential docker.io docker-compose \
     python3-pip libssl-dev pkg-config clang cmake
 
