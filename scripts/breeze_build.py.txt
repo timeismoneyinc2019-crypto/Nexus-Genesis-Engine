@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+"""
+Breeze Build Script
+- Builds Full R&D AI, Red Team AI, Cybersecurity AI
+- Generates stripped-down Engine Helper version
+"""
+
+import os
+import json
+import shutil
+from scripts.chat import SYSTEM_PROMPT
+
+BUILD_DIR = "Breeze_Full"
+STRIPPED_DIR = "Breeze_Engine_Helper"
+
+# 1. Create build directories
+os.makedirs(BUILD_DIR, exist_ok=True)
+os.makedirs(STRIPPED_DIR, exist_ok=True)
+
+# 2. Copy core chat.py and system prompts
+shutil.copy("scripts/chat.py", BUILD_DIR)
+with open(os.path.join(BUILD_DIR, "system_prompt.json"), "w") as f:
+    json.dump({"SYSTEM_PROMPT": SYSTEM_PROMPT}, f, indent=4)
+
+# 3. Auto-generate module templates
+modules = ["R&D_AI", "Red_Team_AI", "Cybersecurity_AI"]
+for module in modules:
+    template_path = os.path.join(BUILD_DIR, f"{module}.py")
+    with open(template_path, "w") as f:
+        f.write(f"# {module} module created by Breeze\n")
+        f.write("def main():\n")
+        f.write("    print('Module running')\n\n")
+        f.write("if __name__ == '__main__':\n")
+        f.write("    main()\n")
+
+# 4. Generate stripped-down engine helper
+shutil.copy(os.path.join(BUILD_DIR, "chat.py"), STRIPPED_DIR)
+# Remove R&D and Red Team modules from engine helper
+for module in modules:
+    path = os.path.join(STRIPPED_DIR, f"{module}.py")
+    if os.path.exists(path):
+        os.remove(path)
+
+print("✅ Full Breeze and Engine Helper versions created.")
