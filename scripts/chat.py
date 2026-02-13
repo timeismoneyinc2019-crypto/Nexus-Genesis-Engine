@@ -10,7 +10,7 @@ import subprocess
 import openai
 
 # --- 1. API Key setup ---
-api_key = os.getenv("OPENAI_API_KEY")
+api_key = os.getenv("OPENAI SECRET_API_KEY")
 if not api_key:
     print("ERROR: OpenAI API key not found. Set OPENAI_API_KEY.")
     exit(1)
