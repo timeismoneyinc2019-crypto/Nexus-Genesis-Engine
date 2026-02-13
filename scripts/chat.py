@@ -1,57 +1,77 @@
 #!/usr/bin/env python3
 """
-Breeze - Nexus AI Assistant for Nexus Genesis Engine
+Breeze - Full Personal Assistant for Nexus Genesis Engine
 """
 
 import os
+import json
+import datetime
+import subprocess
 import openai
 
-# --- 1. Set your OpenAI API key ---
-# Make sure you have exported your key as environment variable
-# Git Bash: export OPENAI_API_KEY="your_key_here"
-# Windows CMD: setx OPENAI_API_KEY "your_key_here"
+# --- 1. API Key setup ---
 api_key = os.getenv("OPENAI_API_KEY")
 if not api_key:
-    print("ERROR: OpenAI API key not found. Please set OPENAI_API_KEY.")
+    print("ERROR: OpenAI API key not found. Set OPENAI_API_KEY.")
     exit(1)
 openai.api_key = api_key
 
-# --- 2. System prompt: Law Envelope, Immutable Core, Behavior Rules, Special Outputs ---
+# --- 2. System prompts and behavior rules ---
 SYSTEM_PROMPT = """
-You are operating under the Nexus Law Envelope.
-Only execute instructions cleared by the Admissibility Gate.
-Do not modify Immutable Core functions under any circumstances.
-CPU-only execution: minimize resource usage, avoid long-running tasks.
-Always be aware of Nexus environment context.
-Never compromise security, privacy, or system integrity.
-
-Behavior Rules:
+You are Breeze, the Nexus AI Assistant.
+- Operates under Law Envelope → Admissibility Gate → Immutable Core hierarchy.
+- CPU-only execution.
 - Always tell the truth; indicate uncertainty if any.
-- Proactively suggest next steps.
-- Break down complex problems into precise, step-by-step solutions.
-- Respect hierarchy: Law Envelope -> Admissibility Gate -> Immutable Core.
-- Maintain professional but warm tone; be assertive in guiding workflows.
-- Pause and request clarification if unsure.
-
-Special Outputs:
-- JSON for scripts:
+- Provide step-by-step instructions for any task, especially R&D AI development.
+- Proactively suggest next steps for Nexus projects.
+- Output commands and module instructions as JSON for automation:
   {"task": "<description>", "module": "<module_name>", "action": "<action>", "parameters": {}}
-- Structured logs: [TIMESTAMP] [MODULE] [STATUS] <message>
-- Text responses for humans: concise and clear.
-- Command outputs: only validated commands.
+- Keep human-readable responses concise and actionable.
+- Never override Immutable Core or bypass Nexus security layers.
+- Handle multi-step processes in sequence and always request clarification if ambiguous.
 """
 
-# --- 3. Main chat loop ---
+# --- 3. Helper: log structured events ---
+def log_event(module, status, message):
+    timestamp = datetime.datetime.now().isoformat()
+    print(f"[{timestamp}] [{module}] [{status}] {message}")
+
+# --- 4. Helper: run local Nexus module commands ---
+def run_module(module_name, *args):
+    try:
+        # Executes Python module within Nexus repo
+        result = subprocess.run(
+            ["python", f"{module_name}.py"] + list(args),
+            capture_output=True, text=True
+        )
+        log_event(module_name, "SUCCESS" if result.returncode == 0 else "FAIL",
+                  result.stdout.strip())
+        return result.stdout.strip()
+    except Exception as e:
+        log_event(module_name, "ERROR", str(e))
+        return str(e)
+
+# --- 5. Main Breeze loop ---
 def main():
     print("Breeze is online. Type 'exit' to quit.")
     while True:
-        user_input = input(">> ")
+        user_input = input(">> ").strip()
         if user_input.lower() in ["exit", "quit"]:
             print("Breeze signing off...")
             break
 
+        # --- 6. Handle direct module commands locally ---
+        # Example: "Run Nexus Health Check" → calls Health Check module
+        if user_input.lower().startswith("run "):
+            parts = user_input.split(" ", 2)
+            module_command = parts[1] if len(parts) > 1 else ""
+            extra_args = parts[2:] if len(parts) > 2 else []
+            output = run_module(module_command, *extra_args)
+            print(output)
+            continue
+
+        # --- 7. API call section for AI assistance ---
         try:
-            # --- 4. API call section ---
             response = openai.ChatCompletion.create(
                 model="gpt-5",
                 messages=[
@@ -60,12 +80,23 @@ def main():
                 ]
             )
 
-            # --- 5. Correctly extract and print response ---
             reply = response['choices'][0]['message']['content']
             print(reply)
 
-        except Exception as e:
-            print("Error calling GPT-5:", str(e))
+            # Attempt to parse JSON if the AI returns commands
+            try:
+                json_start = reply.find('{')
+                json_end = reply.rfind('}') + 1
+                if json_start != -1 and json_end != -1:
+                    command_json = json.loads(reply[json_start:json_end])
+                    log_event("AI_COMMAND", "INFO", json.dumps(command_json))
+            except Exception:
+                pass
 
+        except Exception as e:
+            log_event("GPT-5", "ERROR", str(e))
+            print("Error contacting GPT-5:", str(e))
+
+# --- 8. Run Breeze ---
 if __name__ == "__main__":
     main()
